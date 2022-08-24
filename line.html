@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <canvas></canvas>
+    <script src="https://cdn.socket.io/4.5.0/socket.io.min.js" integrity="sha384-7EyYLQZgWBi67fBtVxw60/OWl1kjsfrPFcaU0pp0nAh+i8FD068QogUvg85Ewy1k" crossorigin="anonymous"></script>
+    <script>
+        let socket = io.connect("http://localhost:3000")
+    </script>
+
+</body>
+<script>
+    let canvasBoard = document.querySelector("canvas");
+    let tool = canvasBoard.getContext("2d");
+    let body = document.querySelector("body");
+    canvasBoard.height = window.innerHeight;
+    canvasBoard.width = window.innerWidth;
+    let iX, iY, fX, fY;
+    let drawingMode = false;
+    body.addEventListener("mousedown", function (e) {
+        drawingMode = true;
+        tool.beginPath();
+        iX = e.clientX 
+        iY=e.clientY 
+        tool.moveTo(iX, iY);
+    })
+    body.addEventListener("mouseup", function (e) {
+        drawingMode = false;
+    })
+    body.addEventListener("mousemove", function (e) {
+        if (drawingMode == false)
+            return;
+        fX = e.clientX 
+        fY = e.clientY 
+        tool.lineTo(fX, fY);
+        tool.stroke();
+        iX = fX;
+        iY = fY;
+    })
+
+</script>
+</html>
