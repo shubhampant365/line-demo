@@ -1,4 +1,4 @@
-makeCallout() {
+ makeCallout() {
         makeMockApiCall({ qrCodes: [this.itemCode], recordId: this.recordId })
             .then(result => {
                 console.log('Response from makeMockApiCall:', result);
