@@ -87,3 +87,47 @@ export default class AssetOnboardNoScan extends LightningElement {
         this.dispatchEvent(event);
     }
 }
+
+
+
+public with sharing class AssetOnboardingController {
+    @AuraEnabled
+    public static void submitAssetDetails(Map<String, Object> assetDetails) {
+        // Process the asset details here
+        // Example: create or update Asset records based on the received data
+
+        // Extracting data from the map
+        String productName = (String) assetDetails.get('productName');
+        String productCategory = (String) assetDetails.get('productCategory');
+        String productSubCategory = (String) assetDetails.get('productSubCategory');
+        String productCode = (String) assetDetails.get('productCode');
+        Date dateOfPurchase = Date.valueOf((String) assetDetails.get('dateOfPurchase'));
+        Date dateOfInstallation = Date.valueOf((String) assetDetails.get('dateOfInstallation'));
+        String salesProductCode = (String) assetDetails.get('salesProductCode');
+        String invoiceNumber = (String) assetDetails.get('invoiceNumber');
+        Date warrantyStartDate = Date.valueOf((String) assetDetails.get('warrantyStartDate'));
+        Date warrantyEndDate = Date.valueOf((String) assetDetails.get('warrantyEndDate'));
+        String sourceOfPurchase = (String) assetDetails.get('sourceOfPurchase');
+        String remarks = (String) assetDetails.get('remarks');
+        Boolean rentalAsset = (Boolean) assetDetails.get('rentalAsset');
+        Id recordId = (Id) assetDetails.get('recordId');
+
+        // Example logic to create an Asset record
+        Asset newAsset = new Asset(
+            Name = productName,
+            Product_Category__c = productCategory,
+            Product_Sub_Category__c = productSubCategory,
+            ProductCode = productCode,
+            Date_of_Purchase__c = dateOfPurchase,
+            Date_of_Installation__c = dateOfInstallation,
+            Sales_Product_Code__c = salesProductCode,
+            Invoice_Number__c = invoiceNumber,
+            Warranty_Start_Date__c = warrantyStartDate,
+            Warranty_End_Date__c = warrantyEndDate,
+            Source_of_Purchase__c = sourceOfPurchase,
+            Remarks__c = remarks,
+            Rental_Asset__c = rentalAsset
+        );
+        insert newAsset;
+    }
+}
