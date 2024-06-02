@@ -1,4 +1,123 @@
- makeCallout() {
+import { LightningElement, track, api } from 'lwc';
+import { ShowToastEvent } from 'lightning/platformShowToastEvent';
+import makeMockApiCall from '@salesforce/apex/AssetOnboardingController.makeMockApiCall';
+import isSerialIdLinked from '@salesforce/apex/AssetOnboardingController.isSerialIdLinked';
+import uploadFile from '@salesforce/apex/AssetOnboardingController.saveAttachment';
+import transferAsset from '@salesforce/apex/AssetOnboardingController.transfertAnAsset';
+import { getBarcodeScanner } from 'lightning/mobileCapabilities';
+
+export default class AssetOnboarding extends LightningElement {
+    @track itemCode;
+    assetId = '02iC40000003xrZIAQ';
+    barcodeScanner;
+    @api recordId;
+    @track files = [];
+    @track isSerialIdLinkedResult = false;
+    @track isItemCodeDisabled = false;
+    @track previousAssetId;
+    @track previousAccount;
+    @track qrCodeResponse;
+
+    connectedCallback() {
+        this.barcodeScanner = getBarcodeScanner();
+    }
+
+    handleInputChange(event) {
+        this.itemCode = event.target.value;
+    }
+
+    handleFileUpload(event) {
+        const file = event.target.files[0];
+        const reader = new FileReader();
+        
+        reader.onload = () => {
+            this.fileData = {
+                fileName: file.name,
+                base64Data: reader.result.split(',')[1]
+            };
+            this.handleSaveDocument(); 
+        };
+
+        reader.readAsDataURL(file);
+    }
+    
+    handleSaveDocument() {
+        if (!this.fileData) {
+            return;
+        }
+        uploadFile({ parentId: this.recordId, fileName: this.fileData.fileName, base64Data: this.fileData.base64Data })
+            .then(result => {
+                this.showSuccessToast('Document uploaded successfully');
+                console.log('Document saved successfully:', result);
+            })
+            .catch(error => {
+                this.showToast('Error', error.body.message, 'error');
+            });
+    }
+
+    showSuccessToast(message) {
+        const event = new ShowToastEvent({
+            title: 'Success',
+            message: message,
+            variant: 'success',
+        });
+        this.dispatchEvent(event);
+    }
+
+    handleScan() {
+        if (this.barcodeScanner.isAvailable()) {
+            let scanningOptions = {
+                barcodeTypes: ["code128","code39", "code93", "ean13", "ean8", "upca", "upce", "qr", "datamatrix", "itf", "pdf417"], 
+                instructionText:"Position barcode in the scanner view.\nPress x to stop.",
+                successText:"Successful Scan!"
+            };
+            this.barcodeScanner.scan(scanningOptions)
+                .then((results) => {
+                    this.itemCode = results.value;
+                    this.isItemCodeDisabled = true;
+                })
+                .catch((error) => {
+                    this.showToast('Error', error.body.message, 'error');
+                })
+                .finally(() => {
+                    this.barcodeScanner.dismiss();
+                });
+        } else {
+            this.showToast('Error', 'Barcode scanner is not available', 'error');
+        }
+    }
+
+    handleCallout() {
+        if (!this.itemCode) {
+            this.showToast('Warning', 'Please enter a value in the input field.', 'warning');
+            return;
+        }
+
+        isSerialIdLinked({ serialId: this.itemCode })
+            .then(result => {
+                this.isSerialIdLinkedResult = result.isLinked;
+                this.previousAssetId = result.recordId;
+                this.previousAccount = result.AccountId;
+                if (result.isLinked) {
+                    this.showToast('Warning', 'The scanned serial ID is already linked with an existing asset.', 'warning');
+                } else {
+                    this.makeCallout();
+                }
+            })
+            .catch(error => {
+                this.showToast('Error', error.body.message, 'error');
+            });
+    }
+
+    handleTransferClick() {
+        transferAsset({ recordID: this.recordId, previousAssetId: this.previousAssetId, accountId: this.previousAccount }).then(result => {
+            this.showToast('Success', result, 'success');
+        }).catch(error => {
+            this.showToast('Error', error.body.message, 'error');
+        });
+    }
+
+    makeCallout() {
         makeMockApiCall({ qrCodes: [this.itemCode], recordId: this.recordId })
             .then(result => {
                 console.log('Response from makeMockApiCall:', result);
@@ -20,3 +139,13 @@
                 this.showToast('Error', error.body.message, 'error');
             });
     }
+
+    showToast(title, message, variant) {
+        const event = new ShowToastEvent({
+            title: title,
+            message: message,
+            variant: variant
+        });
+        this.dispatchEvent(event);
+    }
+}
