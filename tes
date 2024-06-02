@@ -1,17 +1,5 @@
 <template>
     <lightning-card title="Asset Details" style="padding: 20px;">
-        <!-- Record Details Section -->
-        <div style="margin-bottom: 20px;">
-            <lightning-record-view-form
-                record-id={assetId}
-                object-api-name="Asset">
-                <lightning-output-field field-name="Product_Name__c" style="margin-left: 15px;"></lightning-output-field>
-                <lightning-output-field field-name="ProductCode" style="margin-left: 15px;"></lightning-output-field>
-                <lightning-output-field field-name="Product_Category__c" style="margin-left: 15px;"></lightning-output-field>
-                <lightning-output-field field-name="Product_Sub_Category__c" style="margin-left: 15px;"></lightning-output-field>
-                <lightning-output-field field-name="Asset_Category__c" style="margin-left: 15px;"></lightning-output-field>
-            </lightning-record-view-form>
-        </div>
         <!-- Form Section -->
         <div style="margin-bottom: 20px;">
             <lightning-button label="Scan Code" onclick={handleScan} style="margin-left: 15px;"></lightning-button>
