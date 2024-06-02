@@ -10,31 +10,33 @@
 </template>
 
 
+
 import { LightningElement, api, wire, track } from 'lwc';
 import { getRecord } from 'lightning/uiRecordApi';
+import WORKORDER_FIELD from '@salesforce/schema/WorkOrderLineItem.WorkOrderId';
 import BUSINESS_UNIT_FIELD from '@salesforce/schema/WorkOrder.Business_Unit__c';
 
-const FIELDS = [BUSINESS_UNIT_FIELD];
+const WORKORDERLINEITEM_FIELDS = [WORKORDER_FIELD];
+const WORKORDER_FIELDS = [BUSINESS_UNIT_FIELD];
 
 export default class AssetOnboardingParent extends LightningElement {
     @api recordId;  // This will be the ID of the WorkOrderLineItem
     @track workOrderId;  // ID of the WorkOrder parent
     @track businessUnit;
 
-    // Assume the WorkOrder ID is related to WorkOrderLineItem
-    connectedCallback() {
-        // Fetch the WorkOrder ID from WorkOrderLineItem
-        // This should be updated based on the actual API
-        getRecord({ recordId: this.recordId, fields: ['WorkOrderLineItem.WorkOrderId'] })
-            .then(record => {
-                this.workOrderId = record.fields.WorkOrderId.value;
-            });
+    @wire(getRecord, { recordId: '$recordId', fields: WORKORDERLINEITEM_FIELDS })
+    loadWorkOrderId({ error, data }) {
+        if (error) {
+            console.error('Error loading WorkOrderLineItem:', error);
+        } else if (data) {
+            this.workOrderId = data.fields.WorkOrderId.value;
+        }
     }
 
-    @wire(getRecord, { recordId: '$workOrderId', fields: FIELDS })
+    @wire(getRecord, { recordId: '$workOrderId', fields: WORKORDER_FIELDS })
     loadBusinessUnit({ error, data }) {
         if (error) {
-            console.error(error);
+            console.error('Error loading WorkOrder:', error);
         } else if (data) {
             this.businessUnit = data.fields.Business_Unit__c.value;
         }
@@ -43,20 +45,4 @@ export default class AssetOnboardingParent extends LightningElement {
     get isRelevantBusinessUnit() {
         return this.businessUnit === 'Locks' || this.businessUnit === 'Appliances';
     }
-}
-
-
-
-<template>
-    <lightning-card title="Other Component">
-        <!-- Add your custom content for the other component here -->
-        <p>This is the other component displayed for Business Units other than Locks or Appliances.</p>
-    </lightning-card>
-</template>
-
-
-import { LightningElement, api } from 'lwc';
-
-export default class AssetOnboardNoScan extends LightningElement {
-    @api recordId;
 }
