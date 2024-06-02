@@ -120,10 +120,12 @@ export default class AssetOnboarding extends LightningElement {
     makeCallout() {
         makeMockApiCall({ qrCodes: [this.itemCode], recordId: this.recordId })
             .then(result => {
-                console.log('Response from makeMockApiCall:', JSON.stringify(result, null, 2));
-                if (result && result.LstProductDetailsApiList && result.LstProductDetailsApiList.length > 0) {
-                    this.qrCodeResponse = result.LstProductDetailsApiList[0]; // Assuming only one response
-                    console.log('QR Code Response:', this.qrCodeResponse);
+                console.log('Raw Response from makeMockApiCall:', result);
+                const parsedResult = JSON.parse(result);
+                console.log('Parsed Response from makeMockApiCall:', JSON.stringify(parsedResult, null, 2));
+                if (parsedResult && parsedResult.LstProductDetailsApiList && parsedResult.LstProductDetailsApiList.length > 0) {
+                    this.qrCodeResponse = parsedResult.LstProductDetailsApiList[0]; // Assuming only one response
+                    console.log('QR Code Response:', JSON.stringify(this.qrCodeResponse, null, 2));
                     if (this.qrCodeResponse.Status === 'INVALID') {
                         this.showToast('Error', this.qrCodeResponse.ResponseMessage, 'error');
                     } else {
