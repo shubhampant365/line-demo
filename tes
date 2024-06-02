@@ -1,21 +1,245 @@
 <template>
     <lightning-card title="Asset Onboarding" style="padding: 20px;">
-        <div style="margin-bottom: 20px;">
-            <lightning-input label="Product Name" value={productName} onchange={handleInputChange} data-id="productName" style="margin-left: 15px;"></lightning-input>
-            <lightning-input label="Product Category" value={productCategory} onchange={handleInputChange} data-id="productCategory" style="margin-left: 15px;"></lightning-input>
-            <lightning-input label="Product Subcategory" value={productSubCategory} onchange={handleInputChange} data-id="productSubCategory" style="margin-left: 15px;"></lightning-input>
-            <lightning-input label="Product Code" value={productCode} onchange={handleInputChange} data-id="productCode" style="margin-left: 15px;"></lightning-input>
-            <lightning-input label="Date of Purchase" type="date" value={dateOfPurchase} onchange={handleInputChange} data-id="dateOfPurchase" style="margin-left: 15px;"></lightning-input>
-            <lightning-input label="Date of Installation" type="date" value={dateOfInstallation} onchange={handleInputChange} data-id="dateOfInstallation" style="margin-left: 15px;"></lightning-input>
-            <lightning-input label="Sales Product Code" value={salesProductCode} onchange={handleInputChange} data-id="salesProductCode" style="margin-left: 15px;"></lightning-input>
-            <lightning-input label="Invoice Number" value={invoiceNumber} onchange={handleInputChange} data-id="invoiceNumber" style="margin-left: 15px;"></lightning-input>
-            <lightning-input label="Warranty Start Date" type="date" value={warrantyStartDate} onchange={handleInputChange} data-id="warrantyStartDate" style="margin-left: 15px;"></lightning-input>
-            <lightning-input label="Warranty End Date" type="date" value={warrantyEndDate} onchange={handleInputChange} data-id="warrantyEndDate" style="margin-left: 15px;"></lightning-input>
-            <lightning-input label="Source of Purchase" value={sourceOfPurchase} onchange={handleInputChange} data-id="sourceOfPurchase" style="margin-left: 15px;"></lightning-input>
-            <lightning-textarea label="Remarks" value={remarks} onchange={handleInputChange} data-id="remarks" style="margin-left: 15px;"></lightning-textarea>
-            <lightning-input type="checkbox" label="Rental Asset" checked={rentalAsset} onchange={handleCheckboxChange} data-id="rentalAsset" style="margin-left: 15px;"></lightning-input>
-            <lightning-button label="Submit" onclick={handleSubmit} style="margin-top: 20px; margin-left: 15px;"></lightning-button>
+        <div class="slds-grid slds-gutters slds-m-bottom_medium">
+            <lightning-input
+                class="slds-col slds-size_3-of-4"
+                label="Product Name"
+                value={productName}
+                onchange={handleInputChange}
+                data-id="productName"
+                disabled={isProductNameDisabled}>
+            </lightning-input>
+            <lightning-button-icon
+                class="slds-col slds-size_1-of-4"
+                icon-name="utility:edit"
+                alternative-text="Edit"
+                onclick={handleEditClick}
+                data-id="productName">
+            </lightning-button-icon>
         </div>
+
+        <div class="slds-grid slds-gutters slds-m-bottom_medium">
+            <lightning-input
+                class="slds-col slds-size_3-of-4"
+                label="Product Category"
+                value={productCategory}
+                onchange={handleInputChange}
+                data-id="productCategory"
+                disabled={isProductCategoryDisabled}>
+            </lightning-input>
+            <lightning-button-icon
+                class="slds-col slds-size_1-of-4"
+                icon-name="utility:edit"
+                alternative-text="Edit"
+                onclick={handleEditClick}
+                data-id="productCategory">
+            </lightning-button-icon>
+        </div>
+
+        <div class="slds-grid slds-gutters slds-m-bottom_medium">
+            <lightning-input
+                class="slds-col slds-size_3-of-4"
+                label="Product Subcategory"
+                value={productSubCategory}
+                onchange={handleInputChange}
+                data-id="productSubCategory"
+                disabled={isProductSubCategoryDisabled}>
+            </lightning-input>
+            <lightning-button-icon
+                class="slds-col slds-size_1-of-4"
+                icon-name="utility:edit"
+                alternative-text="Edit"
+                onclick={handleEditClick}
+                data-id="productSubCategory">
+            </lightning-button-icon>
+        </div>
+
+        <div class="slds-grid slds-gutters slds-m-bottom_medium">
+            <lightning-input
+                class="slds-col slds-size_3-of-4"
+                label="Product Code"
+                value={productCode}
+                onchange={handleInputChange}
+                data-id="productCode"
+                disabled={isProductCodeDisabled}>
+            </lightning-input>
+            <lightning-button-icon
+                class="slds-col slds-size_1-of-4"
+                icon-name="utility:edit"
+                alternative-text="Edit"
+                onclick={handleEditClick}
+                data-id="productCode">
+            </lightning-button-icon>
+        </div>
+
+        <div class="slds-grid slds-gutters slds-m-bottom_medium">
+            <lightning-input
+                class="slds-col slds-size_3-of-4"
+                label="Date of Purchase"
+                type="date"
+                value={dateOfPurchase}
+                onchange={handleInputChange}
+                data-id="dateOfPurchase"
+                disabled={isDateOfPurchaseDisabled}>
+            </lightning-input>
+            <lightning-button-icon
+                class="slds-col slds-size_1-of-4"
+                icon-name="utility:edit"
+                alternative-text="Edit"
+                onclick={handleEditClick}
+                data-id="dateOfPurchase">
+            </lightning-button-icon>
+        </div>
+
+        <div class="slds-grid slds-gutters slds-m-bottom_medium">
+            <lightning-input
+                class="slds-col slds-size_3-of-4"
+                label="Date of Installation"
+                type="date"
+                value={dateOfInstallation}
+                onchange={handleInputChange}
+                data-id="dateOfInstallation"
+                disabled={isDateOfInstallationDisabled}>
+            </lightning-input>
+            <lightning-button-icon
+                class="slds-col slds-size_1-of-4"
+                icon-name="utility:edit"
+                alternative-text="Edit"
+                onclick={handleEditClick}
+                data-id="dateOfInstallation">
+            </lightning-button-icon>
+        </div>
+
+        <div class="slds-grid slds-gutters slds-m-bottom_medium">
+            <lightning-input
+                class="slds-col slds-size_3-of-4"
+                label="Sales Product Code"
+                value={salesProductCode}
+                onchange={handleInputChange}
+                data-id="salesProductCode"
+                disabled={isSalesProductCodeDisabled}>
+            </lightning-input>
+            <lightning-button-icon
+                class="slds-col slds-size_1-of-4"
+                icon-name="utility:edit"
+                alternative-text="Edit"
+                onclick={handleEditClick}
+                data-id="salesProductCode">
+            </lightning-button-icon>
+        </div>
+
+        <div class="slds-grid slds-gutters slds-m-bottom_medium">
+            <lightning-input
+                class="slds-col slds-size_3-of-4"
+                label="Invoice Number"
+                value={invoiceNumber}
+                onchange={handleInputChange}
+                data-id="invoiceNumber"
+                disabled={isInvoiceNumberDisabled}>
+            </lightning-input>
+            <lightning-button-icon
+                class="slds-col slds-size_1-of-4"
+                icon-name="utility:edit"
+                alternative-text="Edit"
+                onclick={handleEditClick}
+                data-id="invoiceNumber">
+            </lightning-button-icon>
+        </div>
+
+        <div class="slds-grid slds-gutters slds-m-bottom_medium">
+            <lightning-input
+                class="slds-col slds-size_3-of-4"
+                label="Warranty Start Date"
+                type="date"
+                value={warrantyStartDate}
+                onchange={handleInputChange}
+                data-id="warrantyStartDate"
+                disabled={isWarrantyStartDateDisabled}>
+            </lightning-input>
+            <lightning-button-icon
+                class="slds-col slds-size_1-of-4"
+                icon-name="utility:edit"
+                alternative-text="Edit"
+                onclick={handleEditClick}
+                data-id="warrantyStartDate">
+            </lightning-button-icon>
+        </div>
+
+        <div class="slds-grid slds-gutters slds-m-bottom_medium">
+            <lightning-input
+                class="slds-col slds-size_3-of-4"
+                label="Warranty End Date"
+                type="date"
+                value={warrantyEndDate}
+                onchange={handleInputChange}
+                data-id="warrantyEndDate"
+                disabled={isWarrantyEndDateDisabled}>
+            </lightning-input>
+            <lightning-button-icon
+                class="slds-col slds-size_1-of-4"
+                icon-name="utility:edit"
+                alternative-text="Edit"
+                onclick={handleEditClick}
+                data-id="warrantyEndDate">
+            </lightning-button-icon>
+        </div>
+
+        <div class="slds-grid slds-gutters slds-m-bottom_medium">
+            <lightning-input
+                class="slds-col slds-size_3-of-4"
+                label="Source of Purchase"
+                value={sourceOfPurchase}
+                onchange={handleInputChange}
+                data-id="sourceOfPurchase"
+                disabled={isSourceOfPurchaseDisabled}>
+            </lightning-input>
+            <lightning-button-icon
+                class="slds-col slds-size_1-of-4"
+                icon-name="utility:edit"
+                alternative-text="Edit"
+                onclick={handleEditClick}
+                data-id="sourceOfPurchase">
+            </lightning-button-icon>
+        </div>
+
+        <div class="slds-grid slds-gutters slds-m-bottom_medium">
+            <lightning-textarea
+                class="slds-col slds-size_3-of-4"
+                label="Remarks"
+                value={remarks}
+                onchange={handleInputChange}
+                data-id="remarks"
+                disabled={isRemarksDisabled}>
+            </lightning-textarea>
+            <lightning-button-icon
+                class="slds-col slds-size_1-of-4"
+                icon-name="utility:edit"
+                alternative-text="Edit"
+                onclick={handleEditClick}
+                data-id="remarks">
+            </lightning-button-icon>
+        </div>
+
+        <div class="slds-grid slds-gutters slds-m-bottom_medium">
+            <lightning-input
+                class="slds-col slds-size_3-of-4"
+                type="checkbox"
+                label="Rental Asset"
+                checked={rentalAsset}
+                onchange={handleCheckboxChange}
+                data-id="rentalAsset"
+                disabled={isRentalAssetDisabled}>
+            </lightning-input>
+            <lightning-button-icon
+                class="slds-col slds-size_1-of-4"
+                icon-name="utility:edit"
+                alternative-text="Edit"
+                onclick={handleEditClick}
+                data-id="rentalAsset">
+            </lightning-button-icon>
+        </div>
+
+        <lightning-button label="Submit" onclick={handleSubmit} class="slds-m-top_medium"></lightning-button>
     </lightning-card>
 </template>
 
@@ -42,13 +266,32 @@ export default class AssetOnboardNoScan extends LightningElement {
     @track remarks = '';
     @track rentalAsset = false;
 
+    @track isProductNameDisabled = true;
+    @track isProductCategoryDisabled = true;
+    @track isProductSubCategoryDisabled = true;
+    @track isProductCodeDisabled = true;
+    @track isDateOfPurchaseDisabled = true;
+    @track isDateOfInstallationDisabled = true;
+    @track isSalesProductCodeDisabled = true;
+    @track isInvoiceNumberDisabled = true;
+    @track isWarrantyStartDateDisabled = true;
+    @track isWarrantyEndDateDisabled = true;
+    @track isSourceOfPurchaseDisabled = true;
+    @track isRemarksDisabled = true;
+    @track isRentalAssetDisabled = true;
+
     handleInputChange(event) {
         const field = event.target.dataset.id;
-        this[field] = event.target.value;
+        this[field] = event.target.type === 'checkbox' ? event.target.checked : event.target.value;
     }
 
     handleCheckboxChange(event) {
         this.rentalAsset = event.target.checked;
+    }
+
+    handleEditClick(event) {
+        const field = `is${event.target.dataset.id.charAt(0).toUpperCase() + event.target.dataset.id.slice(1)}Disabled`;
+        this[field] = false;
     }
 
     handleSubmit() {
@@ -85,49 +328,5 @@ export default class AssetOnboardNoScan extends LightningElement {
             variant: variant
         });
         this.dispatchEvent(event);
-    }
-}
-
-
-
-public with sharing class AssetOnboardingController {
-    @AuraEnabled
-    public static void submitAssetDetails(Map<String, Object> assetDetails) {
-        // Process the asset details here
-        // Example: create or update Asset records based on the received data
-
-        // Extracting data from the map
-        String productName = (String) assetDetails.get('productName');
-        String productCategory = (String) assetDetails.get('productCategory');
-        String productSubCategory = (String) assetDetails.get('productSubCategory');
-        String productCode = (String) assetDetails.get('productCode');
-        Date dateOfPurchase = Date.valueOf((String) assetDetails.get('dateOfPurchase'));
-        Date dateOfInstallation = Date.valueOf((String) assetDetails.get('dateOfInstallation'));
-        String salesProductCode = (String) assetDetails.get('salesProductCode');
-        String invoiceNumber = (String) assetDetails.get('invoiceNumber');
-        Date warrantyStartDate = Date.valueOf((String) assetDetails.get('warrantyStartDate'));
-        Date warrantyEndDate = Date.valueOf((String) assetDetails.get('warrantyEndDate'));
-        String sourceOfPurchase = (String) assetDetails.get('sourceOfPurchase');
-        String remarks = (String) assetDetails.get('remarks');
-        Boolean rentalAsset = (Boolean) assetDetails.get('rentalAsset');
-        Id recordId = (Id) assetDetails.get('recordId');
-
-        // Example logic to create an Asset record
-        Asset newAsset = new Asset(
-            Name = productName,
-            Product_Category__c = productCategory,
-            Product_Sub_Category__c = productSubCategory,
-            ProductCode = productCode,
-            Date_of_Purchase__c = dateOfPurchase,
-            Date_of_Installation__c = dateOfInstallation,
-            Sales_Product_Code__c = salesProductCode,
-            Invoice_Number__c = invoiceNumber,
-            Warranty_Start_Date__c = warrantyStartDate,
-            Warranty_End_Date__c = warrantyEndDate,
-            Source_of_Purchase__c = sourceOfPurchase,
-            Remarks__c = remarks,
-            Rental_Asset__c = rentalAsset
-        );
-        insert newAsset;
     }
 }
