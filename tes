@@ -97,6 +97,9 @@ export default class AssetOnboarding extends LightningElement {
                 .then((results) => {
                     this.itemCode = results.value;
                     this.isItemCodeDisabled = true;
+
+                    // Force the UI to update
+                    this.template.querySelector('lightning-input').value = this.itemCode;
                 })
                 .catch((error) => {
                     this.showToast('Error', error.body.message, 'error');
