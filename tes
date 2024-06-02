@@ -1,49 +1,20 @@
 <template>
     <lightning-card title="Asset Details" style="padding: 20px;">
-        <div style="margin-bottom: 20px;">
-            <lightning-button label="Scan Code" onclick={handleScan} style="margin-left: 15px;"></lightning-button>
+        <!-- Spinner Section -->
+        <template if:true={isLoading}>
+            <lightning-spinner alternative-text="Loading" size="large" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);"></lightning-spinner>
+        </template>
 
-            <div class="slds-grid slds-gutters slds-m-bottom_medium">
-                <lightning-input
-                    class="slds-col slds-size_3-of-4"
-                    label="Enter Item Code"
-                    value={itemCode}
-                    onchange={handleInputChange}
-                    data-id="itemCode"
-                    disabled={isItemCodeDisabled}>
-                </lightning-input>
-                <lightning-button-icon
-                    class="slds-col slds-size_1-of-4"
-                    icon-name="utility:edit"
-                    alternative-text="Edit"
-                    onclick={handleEditClick}
-                    data-id="itemCode">
-                </lightning-button-icon>
-            </div>
-
-            <div class="slds-grid slds-gutters slds-m-bottom_medium">
-                <lightning-input
-                    class="slds-col slds-size_3-of-4"
-                    type="file"
-                    label="Upload Invoice"
-                    onchange={handleFileUpload}
-                    data-id="fileUpload">
-                </lightning-input>
-                <lightning-button-icon
-                    class="slds-col slds-size_1-of-4"
-                    icon-name="utility:edit"
-                    alternative-text="Edit"
-                    onclick={handleEditClick}
-                    data-id="fileUpload">
-                </lightning-button-icon>
-            </div>
-
-            <lightning-button label="Submit" onclick={handleCallout} style="margin-top: 20px; margin-left: 15px;"></lightning-button>
-            <lightning-button label="Transfer the Asset" onclick={handleTransferClick} if:true={isSerialIdLinkedResult} style="margin-top: 20px; margin-left: 15px;"></lightning-button>
+        <!-- Form Section -->
+        <div style="display: flex; flex-direction: column; gap: 20px;">
+            <lightning-button label="Scan Code" onclick={handleScan} style="align-self: flex-start; margin-left: 15px;"></lightning-button>
+            <lightning-input label="Enter Item Code" value={itemCode} onchange={handleInputChange} disabled={isItemCodeDisabled} style="align-self: flex-start; margin-left: 15px; width: 300px;"></lightning-input>
+            <lightning-input type="file" label="Upload Invoice" onchange={handleFileUpload} style="align-self: flex-start; margin-left: 15px; width: 300px;"></lightning-input>
+            <lightning-button label="Submit" onclick={handleCallout} style="align-self: flex-start; margin-left: 15px; margin-top: 20px;"></lightning-button>
+            <lightning-button label="Transfer the Asset" onclick={handleTransferClick} if:true={isSerialIdLinkedResult} style="align-self: flex-start; margin-left: 15px; margin-top: 20px;"></lightning-button>
         </div>
     </lightning-card>
 </template>
-
 
 
 import { LightningElement, track, api } from 'lwc';
@@ -54,23 +25,23 @@ import uploadFile from '@salesforce/apex/AssetOnboardingController.saveAttachmen
 import transferAsset from '@salesforce/apex/AssetOnboardingController.transfertAnAsset';
 import { getBarcodeScanner } from 'lightning/mobileCapabilities';
 
-export default class AssetOnboardingScreen extends LightningElement {
-    @track itemCode;
+export default class AssetOnboarding extends LightningElement {
+    @track itemCode = '';
+    assetId = '02iC40000003xrZIAQ';
+    barcodeScanner;
     @api recordId;
     @track isSerialIdLinkedResult = false;
     @track isItemCodeDisabled = false;
-    @track isFileUploadDisabled = false;
     @track previousAssetId;
     @track previousAccount;
-    barcodeScanner;
+    @track isLoading = false;
 
     connectedCallback() {
         this.barcodeScanner = getBarcodeScanner();
     }
 
     handleInputChange(event) {
-        const field = event.target.dataset.id;
-        this[field] = event.target.value;
+        this.itemCode = event.target.value;
     }
 
     handleFileUpload(event) {
@@ -92,6 +63,7 @@ export default class AssetOnboardingScreen extends LightningElement {
         if (!this.fileData) {
             return;
         }
+        this.isLoading = true;
         uploadFile({ parentId: this.recordId, fileName: this.fileData.fileName, base64Data: this.fileData.base64Data })
             .then(result => {
                 this.showSuccessToast('Document uploaded successfully');
@@ -99,6 +71,9 @@ export default class AssetOnboardingScreen extends LightningElement {
             })
             .catch(error => {
                 this.showToast('Error', error.body.message, 'error');
+            })
+            .finally(() => {
+                this.isLoading = false;
             });
     }
 
@@ -140,6 +115,7 @@ export default class AssetOnboardingScreen extends LightningElement {
             return;
         }
 
+        this.isLoading = true;
         isSerialIdLinked({ serialId: this.itemCode })
             .then(result => {
                 this.isSerialIdLinkedResult = result.isLinked;
@@ -153,14 +129,20 @@ export default class AssetOnboardingScreen extends LightningElement {
             })
             .catch(error => {
                 this.showToast('Error', error.body.message, 'error');
+            })
+            .finally(() => {
+                this.isLoading = false;
             });
     }
 
     handleTransferClick() {
+        this.isLoading = true;
         transferAsset({ recordID: this.recordId, previousAssetId: this.previousAssetId, accountId: this.previousAccount }).then(result => {
             this.showToast('Success', result, 'success');
         }).catch(error => {
             this.showToast('Error', error.body.message, 'error');
+        }).finally(() => {
+            this.isLoading = false;
         });
     }
 
@@ -181,12 +163,10 @@ export default class AssetOnboardingScreen extends LightningElement {
             })
             .catch(error => {
                 this.showToast('Error', error.body.message, 'error');
+            })
+            .finally(() => {
+                this.isLoading = false;
             });
-    }
-
-    handleEditClick(event) {
-        const field = `is${event.target.dataset.id.charAt(0).toUpperCase() + event.target.dataset.id.slice(1)}Disabled`;
-        this[field] = false;
     }
 
     showToast(title, message, variant) {
