@@ -120,7 +120,7 @@ export default class AssetOnboarding extends LightningElement {
     makeCallout() {
         makeMockApiCall({ qrCodes: [this.itemCode], recordId: this.recordId })
             .then(result => {
-                console.log('Response from makeMockApiCall:', result);
+                console.log('Response from makeMockApiCall:', JSON.stringify(result, null, 2));
                 if (result && result.LstProductDetailsApiList && result.LstProductDetailsApiList.length > 0) {
                     this.qrCodeResponse = result.LstProductDetailsApiList[0]; // Assuming only one response
                     console.log('QR Code Response:', this.qrCodeResponse);
