@@ -11,12 +11,10 @@ export default class AssetOnboarding extends LightningElement {
     assetId = '02iC40000003xrZIAQ';
     barcodeScanner;
     @api recordId;
-    @track files = [];
     @track isSerialIdLinkedResult = false;
     @track isItemCodeDisabled = false;
     @track previousAssetId;
     @track previousAccount;
-    @track qrCodeResponse;
 
     connectedCallback() {
         this.barcodeScanner = getBarcodeScanner();
@@ -67,9 +65,9 @@ export default class AssetOnboarding extends LightningElement {
     handleScan() {
         if (this.barcodeScanner.isAvailable()) {
             let scanningOptions = {
-                barcodeTypes: ["code128","code39", "code93", "ean13", "ean8", "upca", "upce", "qr", "datamatrix", "itf", "pdf417"], 
-                instructionText:"Position barcode in the scanner view.\nPress x to stop.",
-                successText:"Successful Scan!"
+                barcodeTypes: ["code128", "code39", "code93", "ean13", "ean8", "upca", "upce", "qr", "datamatrix", "itf", "pdf417"], 
+                instructionText: "Position barcode in the scanner view.\nPress x to stop.",
+                successText: "Successful Scan!"
             };
             this.barcodeScanner.scan(scanningOptions)
                 .then((results) => {
@@ -120,24 +118,19 @@ export default class AssetOnboarding extends LightningElement {
     makeCallout() {
         makeMockApiCall({ qrCodes: [this.itemCode], recordId: this.recordId })
             .then(result => {
-                console.log('Raw Response from makeMockApiCall:', result);
                 const parsedResult = JSON.parse(result);
-                console.log('Parsed Response from makeMockApiCall:', JSON.stringify(parsedResult, null, 2));
                 if (parsedResult && parsedResult.LstProductDetailsApiList && parsedResult.LstProductDetailsApiList.length > 0) {
-                    this.qrCodeResponse = parsedResult.LstProductDetailsApiList[0]; // Assuming only one response
-                    console.log('QR Code Response:', JSON.stringify(this.qrCodeResponse, null, 2));
-                    if (this.qrCodeResponse.Status === 'INVALID') {
-                        this.showToast('Error', this.qrCodeResponse.ResponseMessage, 'error');
+                    const qrCodeResponse = parsedResult.LstProductDetailsApiList[0]; // Assuming only one response
+                    if (qrCodeResponse.Status === 'INVALID') {
+                        this.showToast('Error', qrCodeResponse.ResponseMessage, 'error');
                     } else {
                         this.showToast('Success', 'QR Code processed successfully', 'success');
                     }
                 } else {
                     this.showToast('Error', 'No product details found in the response', 'error');
-                    console.log('No product details found in the response');
                 }
             })
             .catch(error => {
-                console.log('Error in makeMockApiCall:', error);
                 this.showToast('Error', error.body.message, 'error');
             });
     }
