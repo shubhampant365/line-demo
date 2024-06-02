@@ -1,19 +1,22 @@
 makeCallout() {
-    makeMockApiCall({ qrCodes: [this.itemCode], recordId: this.recordId })
-        .then(result => {
-            // Check if result and LstProductDetailsApiList are valid
-            if (result && result.LstProductDetailsApiList && result.LstProductDetailsApiList.length > 0) {
-                this.qrCodeResponse = result.LstProductDetailsApiList[0]; // Assuming only one response
-                if (this.qrCodeResponse.Status === 'INVALID') {
-                    this.showToast('Error', this.qrCodeResponse.ResponseMessage, 'error');
+        makeMockApiCall({ qrCodes: [this.itemCode], recordId: this.recordId })
+            .then(result => {
+                console.log('Response from makeMockApiCall:', result);
+                if (result && result.LstProductDetailsApiList && result.LstProductDetailsApiList.length > 0) {
+                    this.qrCodeResponse = result.LstProductDetailsApiList[0]; // Assuming only one response
+                    console.log('QR Code Response:', this.qrCodeResponse);
+                    if (this.qrCodeResponse.Status === 'INVALID') {
+                        this.showToast('Error', this.qrCodeResponse.ResponseMessage, 'error');
+                    } else {
+                        this.showToast('Success', 'QR Code processed successfully', 'success');
+                    }
                 } else {
-                    this.showToast('Success', 'QR Code processed successfully', 'success');
+                    this.showToast('Error', 'No product details found in the response', 'error');
+                    console.log('No product details found in the response');
                 }
-            } else {
-                this.showToast('Error', 'No product details found in the response', 'error');
-            }
-        })
-        .catch(error => {
-            this.showToast('Error', error.body.message, 'error');
-        });
-}
+            })
+            .catch(error => {
+                console.log('Error in makeMockApiCall:', error);
+                this.showToast('Error', error.body.message, 'error');
+            });
+    }
