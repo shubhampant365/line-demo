@@ -1,48 +1,89 @@
 <template>
-    <lightning-card title="Work Order">
-        <template if:true={isRelevantBusinessUnit}>
-            <c-asset-onboarding-screen record-id={recordId}></c-asset-onboarding-screen>
-        </template>
-        <template if:false={isRelevantBusinessUnit}>
-            <c-asset-onboard-no-scan record-id={recordId}></c-asset-onboard-no-scan>
-        </template>
+    <lightning-card title="Asset Onboarding" style="padding: 20px;">
+        <div style="margin-bottom: 20px;">
+            <lightning-input label="Product Name" value={productName} onchange={handleInputChange} data-id="productName" style="margin-left: 15px;"></lightning-input>
+            <lightning-input label="Product Category" value={productCategory} onchange={handleInputChange} data-id="productCategory" style="margin-left: 15px;"></lightning-input>
+            <lightning-input label="Product Subcategory" value={productSubCategory} onchange={handleInputChange} data-id="productSubCategory" style="margin-left: 15px;"></lightning-input>
+            <lightning-input label="Product Code" value={productCode} onchange={handleInputChange} data-id="productCode" style="margin-left: 15px;"></lightning-input>
+            <lightning-input label="Date of Purchase" type="date" value={dateOfPurchase} onchange={handleInputChange} data-id="dateOfPurchase" style="margin-left: 15px;"></lightning-input>
+            <lightning-input label="Date of Installation" type="date" value={dateOfInstallation} onchange={handleInputChange} data-id="dateOfInstallation" style="margin-left: 15px;"></lightning-input>
+            <lightning-input label="Sales Product Code" value={salesProductCode} onchange={handleInputChange} data-id="salesProductCode" style="margin-left: 15px;"></lightning-input>
+            <lightning-input label="Invoice Number" value={invoiceNumber} onchange={handleInputChange} data-id="invoiceNumber" style="margin-left: 15px;"></lightning-input>
+            <lightning-input label="Warranty Start Date" type="date" value={warrantyStartDate} onchange={handleInputChange} data-id="warrantyStartDate" style="margin-left: 15px;"></lightning-input>
+            <lightning-input label="Warranty End Date" type="date" value={warrantyEndDate} onchange={handleInputChange} data-id="warrantyEndDate" style="margin-left: 15px;"></lightning-input>
+            <lightning-input label="Source of Purchase" value={sourceOfPurchase} onchange={handleInputChange} data-id="sourceOfPurchase" style="margin-left: 15px;"></lightning-input>
+            <lightning-textarea label="Remarks" value={remarks} onchange={handleInputChange} data-id="remarks" style="margin-left: 15px;"></lightning-textarea>
+            <lightning-input type="checkbox" label="Rental Asset" checked={rentalAsset} onchange={handleCheckboxChange} data-id="rentalAsset" style="margin-left: 15px;"></lightning-input>
+            <lightning-button label="Submit" onclick={handleSubmit} style="margin-top: 20px; margin-left: 15px;"></lightning-button>
+        </div>
     </lightning-card>
 </template>
 
 
 
-import { LightningElement, api, wire, track } from 'lwc';
-import { getRecord } from 'lightning/uiRecordApi';
-import WORKORDER_FIELD from '@salesforce/schema/WorkOrderLineItem.WorkOrderId';
-import BUSINESS_UNIT_FIELD from '@salesforce/schema/WorkOrder.Business_Unit__c';
+import { LightningElement, track, api } from 'lwc';
+import { ShowToastEvent } from 'lightning/platformShowToastEvent';
+import submitAssetDetails from '@salesforce/apex/AssetOnboardingController.submitAssetDetails';
 
-const WORKORDERLINEITEM_FIELDS = [WORKORDER_FIELD];
-const WORKORDER_FIELDS = [BUSINESS_UNIT_FIELD];
+export default class AssetOnboardNoScan extends LightningElement {
+    @api recordId;
 
-export default class AssetOnboardingParent extends LightningElement {
-    @api recordId;  // This will be the ID of the WorkOrderLineItem
-    @track workOrderId;  // ID of the WorkOrder parent
-    @track businessUnit;
+    @track productName = '';
+    @track productCategory = '';
+    @track productSubCategory = '';
+    @track productCode = '';
+    @track dateOfPurchase = '';
+    @track dateOfInstallation = '';
+    @track salesProductCode = '';
+    @track invoiceNumber = '';
+    @track warrantyStartDate = '';
+    @track warrantyEndDate = '';
+    @track sourceOfPurchase = '';
+    @track remarks = '';
+    @track rentalAsset = false;
 
-    @wire(getRecord, { recordId: '$recordId', fields: WORKORDERLINEITEM_FIELDS })
-    loadWorkOrderId({ error, data }) {
-        if (error) {
-            console.error('Error loading WorkOrderLineItem:', error);
-        } else if (data) {
-            this.workOrderId = data.fields.WorkOrderId.value;
-        }
+    handleInputChange(event) {
+        const field = event.target.dataset.id;
+        this[field] = event.target.value;
     }
 
-    @wire(getRecord, { recordId: '$workOrderId', fields: WORKORDER_FIELDS })
-    loadBusinessUnit({ error, data }) {
-        if (error) {
-            console.error('Error loading WorkOrder:', error);
-        } else if (data) {
-            this.businessUnit = data.fields.Business_Unit__c.value;
-        }
+    handleCheckboxChange(event) {
+        this.rentalAsset = event.target.checked;
     }
 
-    get isRelevantBusinessUnit() {
-        return this.businessUnit === 'Locks' || this.businessUnit === 'Appliances';
+    handleSubmit() {
+        const assetDetails = {
+            productName: this.productName,
+            productCategory: this.productCategory,
+            productSubCategory: this.productSubCategory,
+            productCode: this.productCode,
+            dateOfPurchase: this.dateOfPurchase,
+            dateOfInstallation: this.dateOfInstallation,
+            salesProductCode: this.salesProductCode,
+            invoiceNumber: this.invoiceNumber,
+            warrantyStartDate: this.warrantyStartDate,
+            warrantyEndDate: this.warrantyEndDate,
+            sourceOfPurchase: this.sourceOfPurchase,
+            remarks: this.remarks,
+            rentalAsset: this.rentalAsset,
+            recordId: this.recordId
+        };
+
+        submitAssetDetails({ assetDetails })
+            .then(() => {
+                this.showToast('Success', 'Asset details submitted successfully', 'success');
+            })
+            .catch(error => {
+                this.showToast('Error', error.body.message, 'error');
+            });
+    }
+
+    showToast(title, message, variant) {
+        const event = new ShowToastEvent({
+            title: title,
+            message: message,
+            variant: variant
+        });
+        this.dispatchEvent(event);
     }
 }
