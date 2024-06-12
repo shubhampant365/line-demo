@@ -1,4 +1,20 @@
-saveFormData({ formData: JSON.stringify(formData) }) // Convert formData to JSON string
+handleSave() {
+        if (!this.issue || !this.partCodeId || !this.modelNumber || !this.reasonForReplacement || !this.quantity || !this.selectedDeliveryOption) {
+            this.showToast('Error', 'Please fill in all required fields.', 'error');
+            return;
+        }
+
+        const formData = {
+            issue: this.issue,
+            modelNumber: this.modelNumber,
+            reasonForReplacement: this.reasonForReplacement,
+            selectedDeliveryOption: this.selectedDeliveryOption,
+            recordId: this.recordId,
+            partCodeId: this.partCodeId,
+            quantity: this.quantity
+        };
+
+        saveFormData({ formData: JSON.stringify(formData) }) // Convert formData to JSON string
             .then(result => {
                 const productRequestId = result;
 
