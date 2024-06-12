@@ -1,7 +1,6 @@
 <template>
     <lightning-card title="Issue Form" icon-name="utility:record">
         <div>
-            <lightning-input label="Work Order Number" value={workOrderNumber} disabled></lightning-input>
             <lightning-input label="Issue" value={issue} onchange={handleIssueChange}></lightning-input>
             <lightning-record-picker 
                 label="Part Code" 
@@ -24,18 +23,10 @@
 </template>
 
 
-
-
-import { LightningElement, track, api, wire } from 'lwc';
-import { getRecord } from 'lightning/uiRecordApi';
+import { LightningElement, track, api } from 'lwc';
 import saveFormData from '@salesforce/apex/RequestSparesController.saveFormData';
 import uploadFile from '@salesforce/apex/RequestSparesController.uploadFile';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
-
-// Define the fields to be retrieved from the WorkOrder object
-const FIELDS = [
-    'WorkOrder.WorkOrderNumber'
-];
 
 export default class RequestSpares extends LightningElement {
     @track issue;
@@ -45,7 +36,6 @@ export default class RequestSpares extends LightningElement {
     @track quantity;
     @track selectedDeliveryOption;
     @api recordId;
-    @track workOrderNumber;
     uploadedFiles = [];
 
     deliveryOptions = [
@@ -53,22 +43,12 @@ export default class RequestSpares extends LightningElement {
         { label: 'Customer', value: 'Customer' }
     ];
 
-    // Wire the getRecord adapter to retrieve the WorkOrder fields
-    @wire(getRecord, { recordId: '$recordId', fields: FIELDS })
-    wiredWorkOrder({ error, data }) {
-        if (data) {
-            this.workOrderNumber = data.fields.WorkOrderNumber.value;
-        } else if (error) {
-            this.showToast('Error', 'Error retrieving Work Order Number', 'error');
-        }
-    }
-
     handleIssueChange(event) {
         this.issue = event.target.value;
     }
 
     handlePartCodeChange(event) {
-        this.partCodeId = event.detail.value[0];
+        this.partCodeId = event.detail.value[0]; // Use a safe method to access the selected product ID
     }
 
     handleModelNumberChange(event) {
@@ -164,6 +144,3 @@ export default class RequestSpares extends LightningElement {
         this.uploadedFiles = [];
     }
 }
-
-
-
